@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>דף קשר לגן</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header no-print">
+  <div class="header-inner">
+    <h1>🌼 דף קשר לגן</h1>
+    <p class="tagline">הגן פותח קבוצה, ההורים ממלאים טופס, ויוצא דף קשר אחד מעוצב להדפסה</p>
+  </div>
+</header>
+
+<div class="demo-banner no-print">
+  🧪 <strong>גרסת הדגמה:</strong> כל הנתונים נשמרים בדפדפן הזה בלבד — לינק הטופס עובד כרגע רק באותו דפדפן.
+  שיתוף אמיתי בין מכשירים יגיע עם חיבור השרת (AWS). אין שרת, אין מעקב, והדוגמאות הן נתונים סינתטיים בלבד.
+</div>
+
+<main>
+
+  <!-- ============ Landing ============ -->
+  <section id="view-landing" class="view no-print">
+    <div class="cards">
+      <div class="big-card">
+        <div class="big-card-icon">👩‍🏫</div>
+        <h2>אני מנהל/ת גן</h2>
+        <p>יוצרים קבוצה, מקבלים לינק לטופס, ומפיקים את דף ה־A4 כשכולם סיימו.</p>
+        <form id="createGroupForm">
+          <input type="text" id="newGroupTitle" required maxlength="60" placeholder='שם הקבוצה, למשל: גן רימון — תשפ"ז'>
+          <input type="text" id="newGroupSubtitle" maxlength="80" placeholder="שורת משנה (אופציונלי), למשל: הגננת דנה והצוות">
+          <button type="submit" class="btn btn-primary btn-block">יצירת קבוצה חדשה</button>
+        </form>
+        <div id="existingGroups" class="existing-groups" hidden>
+          <h3>הקבוצות שלי בדפדפן זה</h3>
+          <ul id="groupList"></ul>
+        </div>
+      </div>
+
+      <div class="big-card">
+        <div class="big-card-icon">👨‍👩‍👧</div>
+        <h2>אני הורה</h2>
+        <p>קיבלתם לינק מהגן? פתחו אותו ומלאו את הטופס הקצר — שם הילד/ה, תמונה, כתובת וטלפונים של ההורים.</p>
+        <p class="muted">אין לינק עדיין? בקשו מהגננת ליצור קבוצה — זה לוקח חצי דקה.</p>
+        <button class="btn btn-secondary btn-block" id="demoTourBtn">🧪 הצצה בדמו עם נתונים סינתטיים</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Admin dashboard ============ -->
+  <section id="view-admin" class="view no-print" hidden>
+    <div class="admin-bar">
+      <a href="#/" class="btn btn-ghost">→ בית</a>
+      <h2 id="adminGroupName"></h2>
+    </div>
+
+    <div class="share-box">
+      <h3>🔗 לינק הטופס להורים</h3>
+      <div class="share-row">
+        <input type="text" id="shareLink" readonly dir="ltr">
+        <button class="btn btn-secondary" id="copyLinkBtn">העתקה</button>
+        <a class="btn btn-ghost" id="openFormLink" target="_blank" rel="noopener">פתיחת הטופס ↗</a>
+      </div>
+      <p class="muted">בגרסת ההדגמה הלינק עובד באותו דפדפן בלבד. עם חיבור AWS כל הורה יוכל למלא מכל מכשיר.</p>
+    </div>
+
+    <div class="submissions-box">
+      <div class="submissions-head">
+        <h3>הטפסים שהתקבלו (<span id="subCount">0</span>)</h3>
+        <div>
+          <button class="btn btn-secondary" id="seedBtn">טעינת נתוני דוגמה סינתטיים</button>
+          <button class="btn btn-danger" id="clearSubsBtn" hidden>ניקוי הכול</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="subsTable" hidden>
+          <thead>
+            <tr><th></th><th>ילד/ה</th><th>כתובת</th><th>הורה 1</th><th>הורה 2</th><th></th></tr>
+          </thead>
+          <tbody id="subsBody"></tbody>
+        </table>
+        <p id="subsEmpty" class="muted empty-note">עוד לא התקבלו טפסים. שלחו את הלינק להורים, או טענו נתוני דוגמה כדי לראות איך זה נראה.</p>
+      </div>
+    </div>
+
+    <div class="print-actions">
+      <button class="btn btn-print" id="printBtn">🖨️ הפקת דף A4 — הדפסה / שמירה כ־PDF</button>
+      <p class="muted">בחלון ההדפסה בחרו "שמירה כ־PDF" לייצוא קובץ, או מדפסת להדפסה על A4. התצוגה המקדימה למטה היא בדיוק מה שיודפס.</p>
+    </div>
+  </section>
+
+  <!-- ============ Parent form ============ -->
+  <section id="view-form" class="view no-print" hidden>
+    <div class="form-card">
+      <h2 id="formGroupName"></h2>
+      <p class="muted" id="formGroupSub"></p>
+      <p class="privacy-note">🔒 הטופס נשמר מקומית בלבד בגרסת ההדגמה. בגרסה המלאה הפרטים יישלחו בצורה מאובטחת לגן בלבד.</p>
+
+      <form id="parentForm" autocomplete="off">
+        <h3>פרטי הילד/ה</h3>
+        <div class="photo-picker">
+          <div class="photo-preview" id="photoPreview"><span>📷</span></div>
+          <div class="photo-picker-actions">
+            <label class="btn btn-secondary">בחירת תמונה<input type="file" id="photoInput" accept="image/*" hidden></label>
+            <button type="button" class="btn btn-ghost" id="clearPhoto" hidden>הסרה</button>
+          </div>
+        </div>
+        <div class="field-row">
+          <label>שם פרטי *<input type="text" id="childFirst" required maxlength="30"></label>
+          <label>שם משפחה *<input type="text" id="childLast" required maxlength="30"></label>
+        </div>
+        <label class="field-full">כתובת<input type="text" id="childAddress" maxlength="90" placeholder="רחוב ומספר, עיר"></label>
+
+        <h3>הורה 1</h3>
+        <div class="field-row">
+          <label>שם *<input type="text" id="p1Name" required maxlength="40"></label>
+          <label>טלפון *<input type="tel" id="p1Phone" required maxlength="20" dir="ltr" placeholder="050-1234567"></label>
+        </div>
+
+        <h3>הורה 2 <span class="muted">(אופציונלי)</span></h3>
+        <div class="field-row">
+          <label>שם<input type="text" id="p2Name" maxlength="40"></label>
+          <label>טלפון<input type="tel" id="p2Phone" maxlength="20" dir="ltr"></label>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">שליחת הטופס לגן ✅</button>
+      </form>
+
+      <div id="formThanks" class="thanks" hidden>
+        <div class="thanks-icon">🎉</div>
+        <h3>הטופס התקבל!</h3>
+        <p class="muted">תודה — הפרטים נשמרו. הגננת תפיק את דף הקשר כשכל ההורים יסיימו.</p>
+        <button class="btn btn-secondary" id="fillAnotherBtn">מילוי טופס נוסף</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ A4 sheet (admin preview + print target) ============ -->
+  <section id="sheetSection" hidden>
+    <div class="preview-label no-print">תצוגה מקדימה — A4</div>
+    <div class="a4-sheet" id="sheet">
+      <div class="sheet-header">
+        <h1 id="sheetTitle">דף קשר</h1>
+        <p id="sheetSubtitle"></p>
+      </div>
+      <div class="sheet-grid" id="sheetGrid">
+        <div class="sheet-empty" id="sheetEmpty"><p>🌱 עוד אין טפסים בקבוצה</p></div>
+      </div>
+      <div class="sheet-footer">נוצר באהבה עבור הגן שלנו 🌼</div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="app-footer no-print">
+  גרסת הדגמה · עיבוד מקומי בדפדפן בלבד · ארכיטקטורה מוכנה ל־AWS לשיתוף אמיתי
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
